@@ -13,12 +13,11 @@ class ChangeFunction(Exception):
 
 class randomDate:
     def __init__(self, *y, m=None, d=None):
-        print(len(y))
         match len(y):
             case 0: y2 = randint(1950, dt.today().year)
             case 1: y2 = y[0]
             case 2: y2 = randint(y[0], y[1])
-        m = m if m else randint(1, 12)
+        m = m or randint(1, 12)
         endDay = 29 if (y2%4 == 0 and m == 2) else finalDay[m-1]
         self.y, self.m = y2, m
         self.d = d if d and d <= endDay else randint(1, endDay)
@@ -67,27 +66,32 @@ def helpLocalCode():
 
 
 def new_1975(date=None, sex=None, alian=None, loc=None):
-    date = date if date else randomDate(1950, 2019)
+    date = date or randomDate(1950, 2019)
     if date.y >= 2020 and date.m >= 10: raise ChangeFunction('2020년 10월 출생자부터는 new_2020 함수를 이용해주십시오.')
-    saCode = sexAlianCode(sex if sex else 0, alian if alian else 0, date.y)
-    loc = loc if loc else randint(0, 99)
-    center = randint(0, 99)
-    order = randint(0, 9)
-    endStr = str(saCode)+str(loc).zfill(2)+str(place).zfill(2)+str(order)
+    saCode = sexAlianCode(sex or 0, alian or 0, date.y)
+    loc = loc or randint(0, 99)
+    center_order = randint(0, 999)
+    endStr = str(saCode)+str(loc).zfill(2)+str(center_order).zfill(3)
     r = list(map(int, str(date)+endStr))
     iFinal = (11-(2*r[0]+3*r[1]+4*r[2]+5*r[3]+6*r[4]+7*r[5]+8*r[6]+9*r[7]+2*r[8]+3*r[9]+4*r[10]+5*r[11])//11)%10
     return str(date)+'-'+endStr+str(iFinal)
     
 
 def new_2020(date=None, sex=None, alian=None):
-    date = date if date else randomDate(2021, dt.today().year)
+    date = date or randomDate(2021, dt.today().year)
     if date.y < 2020 or (date.y==2020 and date.m < 10): raise ChangeFunction('2020년 10월 출생자부터는 new_2020 함수를 이용해주십시오.')
-    saCode = sexAlianCode(sex if sex else 0, alian if alian else 0, date.y)
+    saCode = sexAlianCode(sex or 0, alian or 0, date.y)
     rCode = randint(0, 999999)
     sBack = str(saCode)+str(rCode).zfill(6)
     r = list(map(int, str(date)+sBack))
     iFinal = (11-(2*r[0]+3*r[1]+4*r[2]+5*r[3]+6*r[4]+7*r[5]+8*r[6]+9*r[7]+2*r[8]+3*r[9]+4*r[10]+5*r[11])//11)%10
     return str(date)+'-'+sBack+str(iFinal)
 
+
 def check(r):
-    None
+    splited = r.split('-')
+    if len(r) != 14 or len(splited[0]) != 6 or len(splited[1]) != 7:
+        return '주민등록번호는 000000-0000000 형식의 14자리입니다.'
+    t = list(map(int, r[:6]+r[7:]))
+    if r[-1] != (11-(2*t[0]+3*t[1]+4*t[2]+5*t[3]+6*t[4]+7*t[5]+8*t[6]+9*t[7]+2*t[8]+3*t[9]+4*t[10]+5*t[11])//11)%10:
+        return '주민등록번호의 검증 번호가 틀렸습니다.'
